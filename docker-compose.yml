@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    container_name: python-portfolio
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data.db
+      - SECRET_KEY=change-me-in-production
+    volumes:
+      - ./data:/app/data

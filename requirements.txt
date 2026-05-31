@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-jose[cryptography]
+python-multipart
+pydantic
+pydantic-settings
+strawberry-graphql
+gunicorn
+psycopg2-binary
+pypdf
+numpy
+scikit-learn
+pytest
+httpx
+websockets

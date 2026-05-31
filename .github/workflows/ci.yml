@@ -1,0 +1,39 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          mkdir -p data
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=long
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t python-portfolio:${{ github.sha }} .
+      - name: Test Docker image
+        run: |
+          docker run -d -p 8000:8000 --name portfolio-test \
+            -e SECRET_KEY=ci-test-key \
+            python-portfolio:${{ github.sha }}
+          sleep 3
+          curl -f http://localhost:8000/health || exit 1
+          docker stop portfolio-test
